@@ -13,10 +13,10 @@ jobs:
     - name: Create ACR
       id: create-acr
       run: |
-        az acr create -n KDRegistry -g KDRegistrya0db-rg --location "Southeast Asia" --sku Standard --admin-enabled
+        az acr create -n kdregistry -g kdregistrya0db-rg --location "Southeast Asia" --sku Standard --admin-enabled
         echo "::set-output name=acr_username::`az acr credential show -n KDRegistry --query username | xargs`"
         echo "::set-output name=acr_password::`az acr credential show -n KDRegistry --query passwords[0].value | xargs`"
-        echo "::add-mask::`az acr credential show -n KDRegistry --query passwords[0].value | xargs`"
+        echo "::add-mask::`az acr credential show -n kdregistry --query passwords[0].value | xargs`"
 
     - uses: azure/docker-login@v1
       with:
@@ -27,8 +27,8 @@ jobs:
     - name: Build and push image to ACR
       id: build-image
       run: |
-        docker build "$GITHUB_WORKSPACE/azure-vote" -f  "azure-vote/Dockerfile" -t kdregistry.azurecr.io/myakscluster:${{ github.sha }} --label dockerfile-path=azure-vote/Dockerfile
-        docker push kdregistry.azurecr.io/myakscluster:${{ github.sha }}
+        docker build "$GITHUB_WORKSPACE/azure-vote" -f  "azure-vote/Dockerfile" -t kdregistry.azurecr.io/azure-vote:${{ github.sha }} --label dockerfile-path=azure-vote/Dockerfile
+        docker push kdregistry.azurecr.io/azure-vote:${{ github.sha }}
     
     - uses: azure/k8s-set-context@v1
       id: login
@@ -58,6 +58,6 @@ jobs:
           manifests/deployment.yml
           manifests/service.yml
         images: |
-          kdregistry.azurecr.io/myakscluster:${{ github.sha }}
+          kdregistry.azurecr.io/azure-vote:${{ github.sha }}
         imagepullsecrets: |
           myaksclusterdockerauth   
