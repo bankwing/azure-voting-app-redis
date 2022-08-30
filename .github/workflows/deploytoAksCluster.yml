@@ -13,10 +13,10 @@ jobs:
     - name: Create ACR
       id: create-acr
       run: |
-        az acr create -n kdregistry -g kdregistrya0db-rg --location "Southeast Asia" --sku Standard --admin-enabled
-        echo "::set-output name=acr_username::`az acr credential show -n KDRegistry --query username | xargs`"
-        echo "::set-output name=acr_password::`az acr credential show -n KDRegistry --query passwords[0].value | xargs`"
-        echo "::add-mask::`az acr credential show -n kdregistry --query passwords[0].value | xargs`"
+        #az acr create -n kdregistry -g kdregistrya0db-rg --location "Southeast Asia" --sku Standard --admin-enabled
+        echo "::set-output name=acr_username::`az acr credential show -n kdpoc --query username | xargs`"
+        echo "::set-output name=acr_password::`az acr credential show -n kdpoc --query passwords[0].value | xargs`"
+        echo "::add-mask::`az acr credential show -n kdpoc --query passwords[0].value | xargs`"
 
     - uses: azure/docker-login@v1
       with:
@@ -27,14 +27,16 @@ jobs:
     - name: Build and push image to ACR
       id: build-image
       run: |
-        docker build "$GITHUB_WORKSPACE/azure-vote" -f  "azure-vote/Dockerfile" -t kdregistry.azurecr.io/azure-vote:${{ github.sha }} --label dockerfile-path=azure-vote/Dockerfile
-        docker push kdregistry.azurecr.io/azure-vote:${{ github.sha }}
-    
-    - uses: azure/k8s-set-context@v1
-      id: login
+        docker build "$GITHUB_WORKSPACE/azure-vote" -f  "azure-vote/Dockerfile" -t kdpoc.azurecr.io/azure-vote:${{ github.sha }} --label dockerfile-path=azure-vote/Dockerfile
+        docker push kdpoc.azurecr.io/azure-vote:${{ github.sha }}
+         
+    - name: Set AKS context
+      id: set-context
+      uses: azure/aks-set-context@v3
       with:
-         kubeconfig: ${{ secrets.aks_myakscluster_kubeConfig }}
-    
+        resource-group: 'terraform' 
+        cluster-name: 'kdpoc'
+          
     - name: Create namespace
       run: |
         namespacePresent=`kubectl get namespace | grep default | wc -l`
@@ -46,7 +48,7 @@ jobs:
     - uses: azure/k8s-create-secret@v1
       with:
         namespace: default
-        container-registry-url: kdregistry.azurecr.io
+        container-registry-url: kdpoc.azurecr.io
         container-registry-username: ${{ steps.create-acr.outputs.acr_username }}
         container-registry-password: ${{ steps.create-acr.outputs.acr_password }}
         secret-name: myaksclusterdockerauth
@@ -57,6 +59,6 @@ jobs:
         manifests: |
           azure-vote-all-in-one-redis.yaml
         images: |
-          kdregistry.azurecr.io/azure-vote:${{ github.sha }}
+          kdpoc.azurecr.io/azure-vote:${{ github.sha }}
         imagepullsecrets: |
           myaksclusterdockerauth   
