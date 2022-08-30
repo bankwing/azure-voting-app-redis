@@ -13,10 +13,10 @@ jobs:
     - name: Create ACR
       id: create-acr
       run: |
-        az acr create -n kdpoc -g terraform --location "Southeast Asia" --sku Standard --admin-enabled
-        echo "::set-output name=acr_username::`az acr credential show -n kdpoc --query username | xargs`"
-        echo "::set-output name=acr_password::`az acr credential show -n kdpoc --query passwords[0].value | xargs`"
-        echo "::add-mask::`az acr credential show -n kdpoc --query passwords[0].value | xargs`"
+        az acr create -n ${{ secrets.registry }} -g ${{ secrets.resource_group }} --location "East US" --sku Standard --admin-enabled
+        echo "::set-output name=acr_username::`az acr credential show -n ${{ secrets.registry }} --query username | xargs`"
+        echo "::set-output name=acr_password::`az acr credential show -n ${{ secrets.registry }} --query passwords[0].value | xargs`"
+        echo "::add-mask::`az acr credential show -n ${{ secrets.registry }} --query passwords[0].value | xargs`"
 
     - uses: azure/docker-login@v1
       with:
@@ -34,8 +34,8 @@ jobs:
       id: set-context
       uses: azure/aks-set-context@v3
       with:
-        resource-group: 'terraform' 
-        cluster-name: 'kdpoc'
+        resource-group: '${{ secrets.resource_group }}' 
+        cluster-name: '${{ secrets.cluster_name }}'
           
     - name: Create namespace
       run: |
@@ -59,6 +59,6 @@ jobs:
         manifests: |
           azure-vote-all-in-one-redis.yaml
         images: |
-          kdpoc.azurecr.io/azure-vote:${{ github.sha }}
+          ${{ secrets.registry }}.azurecr.io/azure-vote:${{ github.sha }}
         imagepullsecrets: |
           myaksclusterdockerauth   
