@@ -13,6 +13,7 @@ jobs:
     - name: Create ACR
       id: create-acr
       run: |
+        #1
         az acr create -n ${{ secrets.registry }} -g ${{ secrets.resource_group }} --location "East US" --sku Standard --admin-enabled
         echo "::set-output name=acr_username::`az acr credential show -n ${{ secrets.registry }} --query username | xargs`"
         echo "::set-output name=acr_password::`az acr credential show -n ${{ secrets.registry }} --query passwords[0].value | xargs`"
