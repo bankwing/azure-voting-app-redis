@@ -15,9 +15,8 @@ jobs:
     
     - name: install Snyk CLI
       run: |
-        curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
-        chmod +x ./snyk
-        mv ./snyk ~/.local/bin/
+        curl https://static.snyk.io/cli/latest/snyk-linux -o ~/.local/bin/snyk
+        chmod +x ~/.local/bin/snyk
       
     - name: run Snyk Open Source Test
       run: snyk test --file=azure-vote/requirements.txt
