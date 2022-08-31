@@ -51,7 +51,10 @@ jobs:
       run: |
         docker build "$GITHUB_WORKSPACE/azure-vote" -f  "azure-vote/Dockerfile" -t kdpoc.azurecr.io/azure-vote:${{ github.sha }} --label dockerfile-path=azure-vote/Dockerfile
         docker push kdpoc.azurecr.io/azure-vote:${{ github.sha }}
-         
+        
+    - uses: azure/setup-kubectl@v3
+      id: install-kubectl
+  
     - name: Set AKS context
       id: set-context
       uses: azure/aks-set-context@v3
