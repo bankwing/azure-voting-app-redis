@@ -13,11 +13,7 @@ jobs:
         cache: 'pip' # caching pip dependencies
     - run: pip install -r azure-vote/requirements.txt
     
-    - name: install Snyk CLI
-      run: |
-        curl https://static.snyk.io/cli/latest/snyk-linux -o ~/snyk
-        chmod +x ~/snyk
-        mv ~/snyk ~/.local/bin/snyk
+    - uses: snyk/actions/setup@master
       
     - name: run Snyk Open Source Test
       run: snyk test --file=azure-vote/requirements.txt
