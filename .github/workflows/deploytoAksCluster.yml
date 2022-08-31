@@ -6,11 +6,11 @@ jobs:
     
     - uses: actions/checkout@master
     
-    - uses: actions/setup-python@v1
-    
-    - uses: BSFishy/pip-action@v1
+    - uses: actions/setup-python@v4
       with:
-        requirements: azure-vote/requirements.txt
+        python-version: '3.6'
+        cache: 'pip' # caching pip dependencies
+    - run: pip install -r azure-vote/requirements.txt
     
     - name: Run Snyk to check for vulnerabilities
       uses: snyk/actions/python@master
