@@ -12,13 +12,18 @@ jobs:
         cache: 'pip' # caching pip dependencies
     - run: pip install -r azure-vote/requirements.txt
     
-    - name: Run Snyk to check for vulnerabilities
-      uses: snyk/actions/python@master
-      continue-on-error: true
+    - name: install Snyk CLI
+      run: npm install -g snyk
+      
+    - name: run Snyk Open Source Test
+      run: snyk test --file=azure-vote/requirements.txt
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      with:
-        args: --all-projects
+        
+    - name: run Snyk Code Test
+      run: snyk code test azure-vote/
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           
     - uses: azure/login@v1
       with:
