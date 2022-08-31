@@ -24,7 +24,9 @@ jobs:
       run: snyk code test azure-vote/
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          
+    
+    - uses: elstudio/action-install-azure-cli@v1
+      
     - uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
