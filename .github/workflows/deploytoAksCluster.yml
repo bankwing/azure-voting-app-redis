@@ -14,7 +14,10 @@ jobs:
     - run: pip install -r azure-vote/requirements.txt
     
     - name: install Snyk CLI
-      run: npm install -g snyk
+      run: |
+        curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
+        chmod +x ./snyk
+        mv ./snyk /usr/local/bin/
       
     - name: run Snyk Open Source Test
       run: snyk test --file=azure-vote/requirements.txt
